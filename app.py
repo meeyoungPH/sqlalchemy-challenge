@@ -55,9 +55,24 @@ def stations():
     
     return jsonify(station_list)
 
-# @app.route('api/v1.0/tobs')
-# def tobs():
-#     # code here
+@app.route('/api/v1.0/tobs')
+def tobs():
+    max_station = session.query(Measurement.station).\
+        group_by(Measurement.station).\
+        order_by(func.count(Measurement.station).desc()).first()['station']
+    
+    max_date_str = session.query(Measurement.date).order_by(Measurement.date.desc()).first()['date']
+    max_date = dt.datetime.strptime(max_date_str, '%Y-%m-%d')
+    start_date = max_date - dt.timedelta(365)
+    
+    temps = session.query(Measurement.date, Measurement.tobs).\
+        filter(Measurement.station == max_station).\
+        filter(Measurement.date >= start_date).\
+        order_by(Measurement.date).all()
+    
+    temp_list = [{x.date: x.tobs} for x in temps]
+        
+    return jsonify(temp_list)
 
 # @app.route('/api/v1.0/<start>')
 # def start():
