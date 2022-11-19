@@ -48,9 +48,12 @@ def precipitation():
     
     return jsonify(prcp_list)    
     
-# @app.route('/api/v1.0/stations')
-# def stations():
-#     # code here
+@app.route('/api/v1.0/stations')
+def stations():
+    stations = session.query(Station.station).all()
+    station_list = [x.station for x in stations]
+    
+    return jsonify(station_list)
 
 # @app.route('api/v1.0/tobs')
 # def tobs():
