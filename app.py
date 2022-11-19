@@ -74,13 +74,42 @@ def tobs():
         
     return jsonify(temp_list)
 
-# @app.route('/api/v1.0/<start>')
-# def start():
-#     # code here
+@app.route('/api/v1.0/<start>')
+def start(start):
+    start_str = start
+    start_dt = dt.datetime.strptime(start_str, '%Y-%m-%d') - dt.timedelta(1)
+
+    temps = session.query(func.min(Measurement.tobs).label('min'),func.avg(Measurement.tobs),func.max(Measurement.tobs)).\
+        filter(Measurement.date >= start_dt).one()
     
-# @app.route('/api/v1.0/<start>/<end>')
-# def start_and_end():
-#     # code here
+    temp_summary = [
+        {'min':temps[0],
+        'avg':temps[1],
+        'max':temps[2]
+        }
+    ]
+    
+    return jsonify(temp_summary)
+    
+@app.route('/api/v1.0/<start>/<end>')
+def start_and_end(start, end):
+    start_str = start
+    end_str = end
+    start_dt = dt.datetime.strptime(start_str, '%Y-%m-%d') - dt.timedelta(1)
+    end_dt = dt.datetime.strptime(end_str, '%Y-%m-%d')
+
+    temps = session.query(func.min(Measurement.tobs).label('min'),func.avg(Measurement.tobs),func.max(Measurement.tobs)).\
+        filter(Measurement.date >= start_dt).\
+        filter(Measurement.date <= end_dt).one()
+    
+    temp_summary = [
+        {'min':temps[0],
+        'avg':temps[1],
+        'max':temps[2]
+        }
+    ]
+    
+    return jsonify(temp_summary)
 
 if __name__ == '__main__':
     app.run(debug=True)
