@@ -85,7 +85,7 @@ def tobs():
     # determine start date based on max date of observations
     max_date_str = session.query(Measurement.date).order_by(Measurement.date.desc()).first()['date']
     max_date = dt.datetime.strptime(max_date_str, '%Y-%m-%d')
-    start_date = max_date - dt.timedelta(365)
+    start_date = max_date - dt.timedelta(366)
     
     # query by station and start date
     temps = session.query(Measurement.date, Measurement.tobs).\
